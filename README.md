@@ -5,10 +5,14 @@
     import collections
    
    </br>
+   Importing necessary packages, numpy and pandas for performing a wide variety of mathematical operations on arrays and data manipulation and analysis.
+   </br>
    
     ques = pd.read_csv('Questions.csv',encoding='iso-8859-1')
     ques.head(10)
 
+   </br> Reading the Questions.csv from read.csv and obtaining first 10 rows of the same, to check the redundant columns so that we can remove them to improve our model.
+   </br>
   
       Id OwnerId	CreationDate	ClosedDate	              Score	Title                                             Body
       0	 80	      26.0	        2008-08-01T13:57:07Z	NaN	26	SQLStatement.execute() - multiple queries in o...	<p>I've written a database generation script i...
@@ -23,10 +27,23 @@
       9	 810	    233.0	        2008-08-03T20:35:01Z	NaN	9	Visual Studio Setup Project - Per User Registr...	<p>I'm trying to maintain a Setup Project in <...
       
 </br>
+    So we found these columns which I find redundant and has to be removed.
+    </br>
+      * OwnerUserID : Any sort of categorical data which is very unique for every order or individual then it is to be removed because it produces no good contribution for model making.
+      </br> 
+      * Creation Date : Unless and until it's a time series analysis, there is no such importance or atleast in this analysis for our goal. So, this column is redundant for us.
+      </br>
+      * Closed Date :  Unless and until it's a time series analysis, there is no such importance or atleast in this analysis for our goal. So, this column is redundant for us.
+      </br>
+      * Score : We don't have any analysis to do with score, so hence this column is redundant for us.
+      </br>
 
     ques.drop(["OwnerUserId","CreationDate","ClosedDate","Score"], axis=1, inplace=True)
     ques.head(10)
+    
+   </br> These columns can be removed with drop function. 
 </br>
+So we left with what we needed </br>
 
     	Id	Title	                                            Body
     0	80	SQLStatement.execute() - multiple queries in o...	<p>I've written a database generation script i...
@@ -44,6 +61,15 @@
 
 </br>
 
+## Why am I using Regex here? 
+
+</br>
+As you can see specifically in column "Body", there are  "< p >" tags which is mandatory to remove or else our model will be get trained with it.
+A RegEx, or Regular Expression, is a sequence of characters that forms a search pattern.
+</br>
+RegEx can be used to check if a string contains the specified search pattern.
+</br>
+
     import re 
 
     def rem_html_tags(body):
@@ -52,13 +78,18 @@
      
     ques['Body'] = ques['Body'].apply(rem_html_tags)
     ques.head()
+  </br> Here we used .compile to find the pattern "< >"  and store it in regex variable and .sub function Replaces one or many matches with a space as we mentioned in the parameters.
     
-    
+ </br>
+ Now we have Tags dataset in csv we can read it htrough read_csv() .head() shows the first 5 rows.
  </br>
  
      df_tags = pd.read_csv('Tags.csv', encoding='iso-8859-1')
      df_tags.head()
      
+  </br>
+  
+## Importing important modules and packages for data manipulation and visualization.
   </br>
   
     import numpy as np # linear algebra
