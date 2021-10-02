@@ -187,7 +187,7 @@ Now we import various packages and modules including NLP modules which we will u
     from keras.models import Model
 </br>
 
-From scikit-learn we will import multiLabelBinarizer for doing multilabel classification 
+From scikit-learn we will import multiLabelBinarizer for doing multilabel classification. .fit() -> fit() method, where we use the required formula and perform the calculation on the feature values of input data and fit this calculation to the transformer.
 
 
     multilabel_binarizer = MultiLabelBinarizer()
@@ -199,10 +199,13 @@ From scikit-learn we will import multiLabelBinarizer for doing multilabel classi
        'jquery', 'php', 'python'], dtype=object)
  
  </br>
+ Splitting the data into train and test data using train_test_split
  
     train,test=train_test_split(total[:550000],test_size=0.25,random_state=24)
  
   </br>
+  Segregating them into Title AND body, and applying .transform on train_tags for both train and test dependent variable. 
+  
   
     total=pd.merge(ques, top10_tags, on='Id')
     print(total.shape)
@@ -217,9 +220,26 @@ From scikit-learn we will import multiLabelBinarizer for doing multilabel classi
 
 </br>
 
+# Importing NLP based packages for doing language processing 
+
+</br>
+
+## Importing NLTK package
+
+</br> NLTK, or Natural Language Toolkit, is a Python package that you can use for NLP. A lot of the data that you could be analyzing is unstructured data and contains human-readable text.
+
     import nltk
     nltk.download('punkt')
 
+
+</br>
+
+## What means by word tokenizer?
+
+</br>
+Word tokenization is the process of splitting a large sample of text into words. This is a requirement in natural language processing tasks where each word needs to be captured and subjected to further analysis like classifying and counting them for a particular sentiment etc.</br>
+
+![image](https://user-images.githubusercontent.com/41589522/135713305-e1d88f43-6c8f-4b17-be9f-769c63b164ab.png)
 
 </br>
 
@@ -227,12 +247,24 @@ From scikit-learn we will import multiLabelBinarizer for doing multilabel classi
     for sent in train['Title']:
         sent_lens_t.append(len(word_tokenize(sent)))
     max(sent_lens_t)  
-   
+    #output: 18  
  </br>
  
-    np.quantile(sent_lens_t,0.97)
-    
- </br>
+ Here we will tokenize the same with Tokenizer function. 
+ 
+ 
+ ## What is text to sequences?
+ 
+ 
+ Texts_to_sequences Transforms each text in texts to a sequence of integers. So it basically takes each word in the text and replaces it with its corresponding integer value from the word_index dictionary.
+</br>
+Example </br>
+
+   ![image](https://user-images.githubusercontent.com/41589522/135714065-86f4045e-91d2-4f77-bbba-0abbb0572671.png)
+
+   ![image](https://user-images.githubusercontent.com/41589522/135714075-b71750f8-424e-40a7-8da9-98c9e0e16ca1.png)
+
+ </br>Image credit: MLQ.ai
  
     max_len_t = 18
     tok = Tokenizer(char_level=False,split=' ')
@@ -241,23 +273,33 @@ From scikit-learn we will import multiLabelBinarizer for doing multilabel classi
     
  </br>
  
-    vocab_len_t=len(tok.index_word.keys())
-    vocab_len_t
-    
+ ## What is pad sequences?
+ 
  </br>
+ Pad_sequences is used to ensure that all sequences in a list have the same length. By default this is done by padding 0 in the beginning of each sequence until each sequence has the same length as the longest sequence. </br>
+ 
+ ![image](https://user-images.githubusercontent.com/41589522/135714556-b1d892e0-b246-43b2-b713-be3ab9a2c668.png)
+
   
     sequences_matrix_train_t = sequence.pad_sequences(sequences_train_t,maxlen=max_len_t)
     sequences_matrix_train_t
     
  </br>
- 
+ Same process with test dataset
+ </br>
     sequences_test_t = tok.texts_to_sequences(X_test_t)
     sequences_matrix_test_t = sequence.pad_sequences(sequences_test_t,maxlen=max_len_t)
     
   </br>
+  Taking sequences train and test data shape
+  
+  </br>
   
     sequences_matrix_train_t.shape,sequences_matrix_test_t.shape,y_train.shape,y_test.shape
     
+  </br>
+  Same process with the body of the training and testing dataset
+  
   </br>
   
     sent_lens_b=[]
@@ -265,23 +307,56 @@ From scikit-learn we will import multiLabelBinarizer for doing multilabel classi
         sent_lens_b.append(len(word_tokenize(sent)))
     max(sent_lens_b)
     
-  </br></br>
     
     vocab_len_b =len(tok.index_word.keys())
     vocab_len_b
-    
-  </br>
+
     
     sequences_matrix_train_b = sequence.pad_sequences(sequences_train_b,maxlen=max_len_b)
     sequences_matrix_train_b
-    
-  </br>
   
     sequences_test_b = tok.texts_to_sequences(X_test_b)
     sequences_matrix_test_b = sequence.pad_sequences(sequences_test_b,maxlen=max_len_b)
     
     
   </br>
+  
+  # Model Training Part
+  
+  ## What is RNN?
+  </br>
+  Recurrent neural networks (RNN) are a class of neural networks that are helpful in modeling sequence data. Derived from feedforward networks, RNNs exhibit similar behavior to how human brains function. Simply put: recurrent neural networks produce predictive results in sequential data that other algorithms can't.
+  
+  
+  ![image](https://user-images.githubusercontent.com/41589522/135717897-5a8c11eb-5b37-40ab-b79d-88be77953dea.png)
+Image credit: Wikimedia Commons
+</br>
+
+## What is Embedding layer?
+
+The Embedding layer is defined as the first hidden layer of a network. It must specify 3 arguments:
+</br>
+It must specify 3 arguments:
+</br>
+input_dim: This is the size of the vocabulary in the text data. For example, if your data is integer encoded to values between 0-10, then the size of the vocabulary would be 11 words.</br>
+output_dim: This is the size of the vector space in which words will be embedded. It defines the size of the output vectors from this layer for each word. For example, it could be 32 or 100 or even larger. Test different values for your problem.
+</br>input_length: This is the length of input sequences, as you would define for any input layer of a Keras model. For example, if all of your input documents are comprised of 1000 words, this would be 1000.
+
+
+## Why GRU Layer?
+
+To solve the vanishing gradient problem of a standard RNN, GRU is used. 
+
+## Why Relu?
+
+The main advantage of using the ReLU function over other activation functions is that it does not activate all the neurons at the same time.
+
+## Dropout Layer
+
+Dropout is a technique used to prevent a model from overfitting. Dropout works by randomly setting the outgoing edges of hidden units (neurons that make up hidden layers) to 0 at each update of the training phase.
+
+</br>
+  
   
     def RNN():
       # Title Only
@@ -351,6 +426,13 @@ From scikit-learn we will import multiLabelBinarizer for doing multilabel classi
     Non-trainable params: 800
 
 </br>
+
+## Adam Optimizer
+
+Adam is a replacement optimization algorithm for stochastic gradient descent for training deep learning models. Adam combines the best properties of the AdaGrad and RMSProp algorithms to provide an optimization algorithm that can handle sparse gradients on noisy problems.
+
+Categorical crossentropy
+Categorical crossentropy is a loss function that is used in multi-class classification tasks. These are tasks where an example can only belong to one out of many possible categories, and the model must decide which one. Formally, it is designed to quantify the difference between two probability distributions.
 
     model.compile(optimizer='adam',loss={'main_output': 'categorical_crossentropy', 'aux_output': 'categorical_crossentropy'},
               metrics=['accuracy'])
