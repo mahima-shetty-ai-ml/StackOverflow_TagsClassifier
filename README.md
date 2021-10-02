@@ -103,6 +103,15 @@ RegEx can be used to check if a string contains the specified search pattern.
     import collections
     
  </br>
+ Building color map and color array with respect to np.linspace (0, 0.9, num_plots)
+ </br>
+ 
+    #colormap = plt.cm.gist_ncar
+    #fig = plt.figure().gca(projection='3d')
+    #color_array = [colormap(i) for i in np.linspace(0, 0.9, num_plots)]
+ 
+ </br>
+ Building visualization and legend for the tags visualization 
  
     def plot_tags(tagCount):
     
@@ -121,6 +130,8 @@ RegEx can be used to check if a string contains the specified search pattern.
     plt.show()
     
  </br>
+    Converting tags column from dataset df_tags into a list and putting it in tag count counter and retrieving 10 most common tags out of it. Also plotting the tag counter info and check its data graphics. 
+ </br>
  
     tagCount =  collections.Counter(list(df_tags['Tag'])).most_common(10)
     print(tagCount)
@@ -128,23 +139,43 @@ RegEx can be used to check if a string contains the specified search pattern.
     
  </br>
     
+    
 ![image](https://user-images.githubusercontent.com/41589522/133224238-7e42dda6-d727-41b4-b2ea-6ae3553355be.png)
+
+</br>
+We get those top 10 common tags with us.
 </br>
 
     top10=['javascript','java','c#','php','android','jquery','python','html','c++','ios']
 
 </br>
+    We have ID and top tags with us. We can merge these both datasets Tags and Questions on the basis of ID Column.
+</br>
 
     tag_top10= df_tags[df_tags.Tag.isin(top10)]
     print (tag_top10.shape)
     tag_top10.head()
-    
-</br>
 
     total=pd.merge(ques, top10_tags, on='Id')
     print(total.shape)
     total.head()
 
+</br>
+
+## Understanding MultiLabel Binarizer 
+
+### What is multi label Binarizer?
+</br>
+A set of labels (any orderable and hashable object) for each sample. If the classes parameter is set, y will not be iterated. Returns selfreturns this MultiLabelBinarizer instance fit_transform (y)[source] Fit the label sets binarizer and transform the given label sets.
+</br> Data Credit: Scikit Learn Website </br>
+
+![keras_multi_label_animation](https://user-images.githubusercontent.com/41589522/135709584-d179af3c-e9dc-4708-a04b-357376b43a96.gif)
+
+</br>
+Image Credit: PyImage Search
+</br>
+
+Now we import various packages and modules including NLP modules which we will use later.
 </br>
 
     from sklearn.model_selection import train_test_split
@@ -155,6 +186,9 @@ RegEx can be used to check if a string contains the specified search pattern.
     from keras.layers import LSTM, Activation, Dense, Dropout, Input, Embedding, BatchNormalization, GRU ,concatenate
     from keras.models import Model
 </br>
+
+From scikit-learn we will import multiLabelBinarizer for doing multilabel classification 
+
 
     multilabel_binarizer = MultiLabelBinarizer()
     multilabel_binarizer.fit(total.Tags)
